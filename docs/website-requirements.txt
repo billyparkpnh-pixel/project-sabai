@@ -1,0 +1,100 @@
+You are a senior full-stack engineer and creative director. Build the actual Project Sa’Bai Cambodia website in this GitHub repository, not just a plan or mockup.
+
+REPOSITORY AND STARTUP
+- Repository: billyparkpnh-pixel/project-sabai (use the repository already connected to this Codex environment).
+- First inspect the repository carefully. It currently may contain only a file named `sabai`. Do not overwrite unrelated content without need. If there is no application yet, scaffold a deployable Next.js + TypeScript + Tailwind CSS app at the repository root. Explain any file restructuring.
+- Deliver a fully working responsive website, a README, an `.env.example`, database migrations and seed/demo data, and clear local-development and deployment instructions.
+- Commit the changes to an appropriate branch and provide a concise implementation summary; do not claim any integration works until it is actually tested.
+
+IMAGE ASSETS — USE THE FIVE FILES I UPLOADED
+Look for the following files in `public/references/` or elsewhere in the repository/attached files. If their actual paths differ, discover them instead of assuming paths. Do not substitute random stock images for my references.
+1. `branding-introduction.png`: scrapbook layout with yellow and navy, checkered fabric, Polaroid photos, hand-drawn sun, spiral notebook, 'PROJECT SA’BAI', founding/mission description, and the slogan 'One Goal, One Heart, One SA’BAI!'.
+2. `branding-teams.png`: team photo scrapbook layouts, including Health Education, Public Relations, and Pharm Logs; use this for the About/Our Team visual direction.
+3. `takeo-field-visit.png`: Instagram story from a reconnaissance trip to Takéo Province and permit approval activity. Treat this as background reference, NOT as proof of a completed medical outreach or permission to publish the post.
+4. `merch-pharmacy-care.webp`: FRONT and BACK mockup of a white T-shirt. Front has three small green cartoon characters; back has pharmacist at Rx laptop and text 'Conquering pharmacy care, one prescription code at a time.'
+5. `merch-night-shift.webp`: FRONT and BACK mockup of a white T-shirt. Front chest print reads 'POWERED BY C8H10N4O2'; back says 'THE NIGHT SHIFT CLUB' with a medical-themed illustrated character.
+The provided merchandise images each show front and back in one combined image. Initially show the full original mockups on product detail pages rather than falsely inventing separate high-resolution front/back files. If possible, support optional independently uploaded front/back images later. Do not crop off critical product information.
+Use uploaded image references to guide the UI, and use provided photos publicly only after organization/photographer and relevant people grant usage permission. Until approved, keep them clearly marked as internal/reference assets, replace public-facing sensitive photos with labeled placeholders, and avoid implying that the website is already official.
+If images have not been uploaded yet, build the system with clear placeholders and documented paths to add them. Never claim you received files you can't actually see.
+
+BRAND STYLE AND UX
+- Faithful to the supplied materials: deep navy #233D65, sunshine yellow #FFE365, burgundy #79323D, warm cream #F7F5EF; use accent shades as needed.
+- Youthful, friendly, genuine and credible: scrapbook details, paper textures, Polaroid frames, subtle fabric/checkered patterns, hand-drawn sunshine, occasional notebook spiral motifs. Don't turn every section into a chaotic collage. Maintain spacious layout and clear calls to action.
+- Big expressive headings and slogans; body copy/buttons/forms use highly readable modern fonts, including Khmer-compatible fonts.
+- Responsive mobile-first layouts, keyboard accessibility, visible focus states, high contrast, reduced-motion support, clean navigation and fast performance.
+- Header: logo/wordmark, Home, About, Projects & Impact, Shop, Donate, Contact, cart counter, language switcher (EN/ខ្មែរ). Prominent Donate button. Footer with social links and actual verified contact details or placeholders.
+
+HOME PAGE
+- Compelling hero (approved project photo or video when available), logo/identity and the slogan 'One Goal, One Heart, One SA’BAI!'. Headline: 'Together, We Make a Difference.' Primary CTAs: 'Explore Our Projects' and 'Donate Now'.
+- Short introduction: a community healthcare initiative established in 2006, connecting Cambodian and Singaporean students/healthcare professionals to support healthcare and health education. Clearly mark details requiring official verification before launch.
+- Three featured projects, selected via admin dashboard.
+- Verified impact statistics (editable; placeholders for unverified numbers).
+- Donation callout and featured shop items.
+- Use authentic sincere writing, not invented testimonials or claims.
+
+ABOUT US
+- Mission, history, values, timeline, partner information and team/committee cards.
+- Include Clinic Heads, Health Education, Public Relations, Pharm Logs, and admin-editable additional teams.
+- Names, headshots, titles, and descriptions must be editable and left unpublished until consent and details are provided.
+- Reflect provided scrapbook/photo styling without republishing people’s images by default.
+
+PROJECTS & IMPACT (ONE COMBINED TOP-LEVEL PAGE)
+- Filterable grid of Past, Current, Upcoming projects; filter optionally by year, location and topic.
+- Each project has a clean route, title, province/location, dates, goals, tasks, galleries, approved video links, outcomes and documented impact metrics. Add previous/next or related projects.
+- A 'Our Impact' section on the same page with admin-controlled verified statistics and outcomes. Clearly distinguish actual metrics from development samples.
+- Include optional fundraising call-to-action on project detail pages.
+- Support field visits like a Takéo reconnaissance trip as a separate type (not misrepresented as clinical treatment).
+
+SHOP / MERCHANDISE
+- Navigation item 'Shop', page heading 'Shop for a Cause'.
+- Seed TWO clearly labeled draft/demo products using the provided product references, but no fabricated prices, claims of availability, or stock:
+  * Conquering Pharmacy Care — white T-shirt, front/back design described above.
+  * The Night Shift Club — white T-shirt, front/back design described above.
+- Display uploaded mockups where permitted; click for larger image, support multiple images as they become available.
+- Product detail with sizes, optional colors, quantities, inventory tracking and Add to Cart.
+- Fully functional cart state with updates/removals, shipping/pickup options, and checkout.
+- Checkout collects customer name, email, phone, province/city, delivery address or pickup details, with validation; itemized subtotal, shipping and optional extra donation.
+- Do not invent shipping fees or prices; use admin-configured values, and disable live checkout while unavailable.
+- Server-side inventory/order validation. Order statuses: pending payment, paid, processing, ready for pickup, shipped, delivered, cancelled.
+
+DONATE AND KHQR
+- Donation page with $5, $10, $25, $50, custom amount in USD only if the approved processor/account supports it; otherwise configure actual supported currency. Show why donations matter, without unsupported claims.
+- Optional donor name, email, dedication/message and transparent privacy notice.
+- Build a safe, real integration ARCHITECTURE for an authorized Cambodian KHQR/Bakong-compatible payment provider; DO NOT insert fake real merchant details. Do not assume a static QR can confirm payment or that KHQR API access is available.
+- Keep merchant/provider secrets strictly server-side. Configure via environment variables. Server-side creation of payment intent, secure verified provider callbacks/status polling, idempotency, timestamp handling, status transitions, reconciliation and audit logs.
+- Only mark donations and merchandise orders PAID upon trusted verification of matching payment ID, amount, currency and recipient. Uploaded screenshots or user clicks are NOT payment proof.
+- If payment credentials are missing, implement a conspicuously labeled TEST/DEMO mode with mock payment statuses, non-payable demo QR or placeholder, and no simulated confirmation shown as real. Disable real collection in production until configured.
+- Keep product revenue and donations as separate accounting fields, even when a customer adds a donation to a merchandise order.
+- Provide a human-readable confirmation and receipt record after verified payments.
+
+CONTACT
+- Contact form (name, email, type of enquiry, message), robust validation/anti-spam, submission storage and admin review.
+- Enquiries: general, volunteer, partnership, merchandise, other.
+- Link TikTok `@projectsabai_cambodia` and only official verified socials. Do not invent addresses, telephone numbers or organization email accounts.
+
+ADMIN DASHBOARD
+- Secure role-based admin access, no hardcoded credentials, password reset via supported auth provider.
+- CRUD for pages, projects, media, team profiles, impact statistics, shop products, sizes/prices/inventory, shipping/pickup settings, and featured content.
+- View/adjust fulfillment statuses, view donation records, review contact messages, track payment verification statuses, without manually marking unverifiable payments paid.
+- Minimal useful analytics (orders, revenue and donations) from actual database records, not fake numbers.
+- Content editing should be possible without code changes.
+
+TECHNICAL EXPECTATIONS
+- Use existing stack if present and reasonable; otherwise Next.js/React/TypeScript/Tailwind with accessible components.
+- Use a secure hosted database and auth layer such as Supabase (Postgres + Auth + object storage), but do not hardcode service keys or make the site depend on credentials that are not supplied. Include SQL migrations, storage policies, Row Level Security / server-side authorization as appropriate.
+- Type-check, lint, build, test core shopping/checkout state transitions and access control.
+- Add image optimization, metadata, basic SEO, accessible alt text, loading and error states.
+- Support English and Khmer via editable translation dictionaries, with fallback for missing translations.
+- Patient records or sensitive medical information must NOT be stored on the public charity website.
+- Make all secrets environment variables; include `.env.example` without secrets. Document deploy steps (for example Vercel) and GitHub workflow.
+
+DELIVERY / ORDER OF WORK
+1. Inspect repo and assets. Explain what exists.
+2. Implement coherent home/about/projects/impact/shop/donate/contact frontend UI with faithful visual identity.
+3. Connect database/auth, admin CRUD, shop/cart/order flow, contact storage.
+4. Add proper payment abstraction + safe demo mode, leaving official KHQR credential-dependent steps disabled and documented.
+5. Run install, build, lint/typecheck/tests and fix errors where feasible.
+6. Provide short README with start commands, environment variables, how to add asset files, how to update content, how to turn on authorized KHQR, and how to deploy.
+7. State clearly which features are fully working, which are demo, and which require the organization's assets, rights, configuration or account access.
+
+IMPORTANT: This is a proposed prototype, not an officially approved or verified website. Preserve original photos and branding assets intact as references. Design it so it could be turned into an official site with the organization's permission.
