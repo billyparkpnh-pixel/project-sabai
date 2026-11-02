@@ -2460,3 +2460,81 @@ dialog.modal::backdrop {
     padding: 24px;
   }
 }
+.shared-qr-reference {
+  border: 1px solid #d6cfac;
+  border-radius: 6px;
+  background: #f5f0d9;
+  padding: 22px;
+  margin: 0 0 25px;
+}
+.shared-qr-reference .eyebrow {
+  font-size: 9px;
+  margin-bottom: 12px;
+}
+.shared-qr-reference h3 {
+  font-size: 25px;
+  margin-bottom: 15px;
+}
+.shared-qr-reference img {
+  width: 230px;
+  height: 230px;
+  object-fit: contain;
+  background: white;
+  padding: 10px;
+  margin: 0 auto 20px;
+  image-rendering: pixelated;
+}
+.shared-qr-reference p {
+  font-size: 12px;
+  line-height: 1.8;
+}
+.shared-qr-reference small {
+  font-size: 10px;
+}
+.shared-qr-reference .badge {
+  font-size: 8px;
+  margin-bottom: 14px;
+}
+.qr-awaiting {
+  border: 1px dashed #c0b797;
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 15px;
+}
+.qr-awaiting svg {
+  margin: 0 auto 10px;
+}
+.qr-awaiting p {
+  margin: 0;
+}
+.qr-admin {
+  padding: 25px;
+  background: #efecd9;
+  border: 1px solid #dcd5b6;
+  border-radius: 6px;
+  margin: 25px 0;
+}
+.qr-admin h3 {
+  font-size: 25px;
+}
+.qr-admin p {
+  font-size: 13px;
+}
+.shop-section .product-art {
+  height: 380px;
+}
+@media (max-width: 700px) {
+  .qr-admin {
+    padding: 20px;
+  }
+  .shared-qr-reference {
+    padding: 20px;
+  }
+  .shared-qr-reference img {
+    max-width: 100%;
+    height: auto;
+  }
+  .shop-section .product-art {
+    height: 430px;
+  }
+}

@@ -22,6 +22,7 @@ import {
   catalogVisible,
 } from "@/lib/validation";
 import { transition } from "@/lib/payments";
+import { extractQrReference } from "@/lib/qr-reference";
 export const runtime = "nodejs";
 const limits = new Map<string, { at: number; n: number }>();
 function response(data: unknown, status = 200) {
@@ -61,7 +62,7 @@ async function handle(
         );
       if (limits.size > 10000) limits.clear();
       if (
-        route !== "admin/media" &&
+        !["admin/media", "admin/qr-reference"].includes(route) &&
         Number(req.headers.get("content-length") || 0) > 200000
       )
         return response({ error: "Request too large" }, 413);
@@ -89,6 +90,11 @@ async function handle(
       if (!preview && !admin && process.env.MEDIA_APPROVED !== "true")
         return response({ error: "Asset awaiting publication consent" }, 403);
       const name = path[1] || "";
+      if (name.startsWith("qr-reference-") && !preview && !admin)
+        return response(
+          { error: "Unverified QR is restricted to internal review" },
+          403,
+        );
       if (!/^[a-z0-9-]+\.(png|webp|jpg|jpeg)$/.test(name))
         return response({ error: "Not found" }, 404);
       try {
@@ -216,6 +222,41 @@ async function handle(
     if (route.startsWith("admin")) {
       if (!admin)
         return response({ error: "Administrator access required" }, 401);
+      if (route === "admin/qr-reference" && req.method === "POST") {
+        const form = await req.formData();
+        const file = form.get("file");
+        if (!(file instanceof File) || file.size > 5 * 1024 * 1024)
+          return response(
+            { error: "Upload a poster or QR image up to 5 MB" },
+            400,
+          );
+        try {
+          const { crop, kind } = await extractQrReference(
+            Buffer.from(await file.arrayBuffer()),
+          );
+          const name = "qr-reference-" + crypto.randomUUID() + ".png";
+          await mkdir(resolve("references"), { recursive: true });
+          await writeFile(resolve("references", name), crop, { flag: "wx" });
+          const c = await content();
+          c.settings.sharedQrImage = name;
+          await putRecord("content", "site", c);
+          await audit("qr.reference.extracted", { name, kind });
+          return response({
+            name,
+            kind,
+            message:
+              "Original QR pixels cropped and decoded again to verify the same content. Internal reference only; real payments remain disabled.",
+          });
+        } catch (error) {
+          return response(
+            {
+              error:
+                error instanceof Error ? error.message : "Unable to extract QR",
+            },
+            400,
+          );
+        }
+      }
       if (route === "admin/media") {
         if (req.method === "GET")
           return response({

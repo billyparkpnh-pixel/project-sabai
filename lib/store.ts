@@ -65,7 +65,10 @@ export async function listRecords<T = Record<string, unknown>>(
     .map((r) => JSON.parse(r.data as string));
 }
 export async function content(): Promise<Content> {
-  return (await getRecord<Content>("content", "site")) || structuredClone(seed);
+  const current = await getRecord<Content>("content", "site");
+  return current
+    ? { ...current, settings: { ...seed.settings, ...current.settings } }
+    : structuredClone(seed);
 }
 export async function audit(action: string, detail: unknown) {
   await putRecord("audit", crypto.randomUUID(), {

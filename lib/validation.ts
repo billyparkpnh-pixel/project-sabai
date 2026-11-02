@@ -174,6 +174,10 @@ export const contentSchema = z
       pickup: z.boolean(),
       pickupDetails: z.string(),
       currency: z.literal("USD"),
+      sharedQrImage: z
+        .string()
+        .regex(/^$|^qr-reference-[a-f0-9-]+\.png$/)
+        .default(""),
       pickupFee: z.number().nonnegative().nullable(),
       fulfillmentWindow: z.string(),
       refundPolicy: z.string(),

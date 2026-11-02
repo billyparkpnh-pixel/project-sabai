@@ -74,6 +74,7 @@ export type Content = {
     pickup: boolean;
     pickupDetails: string;
     currency: string;
+    sharedQrImage: string;
     pickupFee: number | null;
     fulfillmentWindow: string;
     refundPolicy: string;
@@ -172,7 +173,7 @@ export const seed: Content = {
       id: "flora-mentalis",
       title: "Flora Mentalis",
       description:
-        "Human-head and floral illustration described in the revised brief. Original artwork has not been supplied.",
+        "Navy tee with “FLORA MENTALIS” on the chest and a floral human-head illustration on the back. Original image file is needed to display the reference shown in chat.",
       image: "",
       color: "Navy",
       preorder: true,
@@ -186,7 +187,7 @@ export const seed: Content = {
       id: "molar-radix",
       title: "Molar Radix",
       description:
-        "Cartoon molar and skateboard design described in the revised brief. Original artwork has not been supplied.",
+        "White tee with “Preserve before disaster” and a small plane on the front; a skateboarding molar and “Spot the speck before the wreck” on the back. Original image file is needed to display the reference shown in chat.",
       image: "",
       color: "White",
       preorder: true,
@@ -200,7 +201,7 @@ export const seed: Content = {
       id: "snoopy-medical",
       title: "Snoopy Medical Illustration",
       description:
-        "Medical character artwork described in the revised brief. DRAFT ONLY: character and artwork merchandising rights require confirmation.",
+        "Cream tee with “Unless you’re a Doctor, you can’t read this” on the front and a group of Snoopy medical illustrations on the back. DRAFT ONLY: character and artwork merchandising rights require confirmation. Original image file needed.",
       image: "",
       color: "White",
       preorder: true,
@@ -214,7 +215,7 @@ export const seed: Content = {
       id: "brace-yourself",
       title: "Brace Yourself",
       description:
-        "Medical/dental x-ray-themed design described in the revised brief. Original artwork has not been supplied.",
+        "Royal blue tee with “BRACE YOURSELF” and a barcode on the front; “FEED THE BRAIN” and a dental x-ray-style illustration on the back. Original image file is needed to display the reference shown in chat.",
       image: "",
       color: "Royal blue",
       preorder: true,
@@ -377,6 +378,7 @@ export const seed: Content = {
     pickup: true,
     pickupDetails: "Pickup arrangements must be confirmed by the team.",
     currency: "USD",
+    sharedQrImage: "",
     pickupFee: null,
     fulfillmentWindow: "Awaiting approved preorder fulfillment window.",
     refundPolicy:

@@ -1,4 +1,11 @@
 import { test, expect } from "@playwright/test";
+import QRCode from "qrcode";
+import { unlink } from "node:fs/promises";
+import { resolve } from "node:path";
+let referenceImage = "";
+test.afterAll(async () => {
+  if (referenceImage) await unlink(resolve("references", referenceImage));
+});
 test("desktop and mobile pages, product, cart, checkout and test confirmation", async ({
   page,
 }) => {
@@ -24,6 +31,16 @@ test("desktop and mobile pages, product, cart, checkout and test confirmation", 
       })
     ).status(),
   ).toBe(200);
+  const qr = await QRCode.toBuffer("https://example.com/test-only-no-payment");
+  const extracted = await page.request.post("/api/admin/qr-reference", {
+    headers: { Origin: origin },
+    multipart: {
+      file: { name: "test-reference.png", mimeType: "image/png", buffer: qr },
+    },
+  });
+  expect(extracted.status()).toBe(200);
+  const qrResult = await extracted.json();
+  referenceImage = qrResult.name;
   await page.request.post("/api/auth/logout", {
     headers: { Origin: origin },
     data: {},
@@ -35,6 +52,7 @@ test("desktop and mobile pages, product, cart, checkout and test confirmation", 
     page.getByRole("heading", { name: "Together, we make a difference." }),
   ).toBeVisible();
   await expect(page.locator(".hero-photo")).toBeVisible();
+  await expect(page.locator(".product-card")).toHaveCount(10);
   await page.locator("footer").scrollIntoViewIfNeeded();
   await page.locator(".hero-photo").scrollIntoViewIfNeeded();
   await page.screenshot({ path: "/tmp/sabai-desktop.png", fullPage: true });
@@ -54,6 +72,12 @@ test("desktop and mobile pages, product, cart, checkout and test confirmation", 
       ),
     ).toBeTruthy();
   }
+  await page.goto("/donate");
+  await expect(page.locator(".product-card")).toHaveCount(0);
+  await expect(
+    page.getByRole("region", { name: "Donation QR reference" }).locator("img"),
+  ).toHaveAttribute("src", "/api/media/" + referenceImage);
+  await expect(page.locator('img[src*="poster"]')).toHaveCount(0);
   await page.goto("/projects/takeo-field-visit");
   await expect(page.getByText("Example planning activity")).toBeVisible();
   await expect(
@@ -83,6 +107,11 @@ test("desktop and mobile pages, product, cart, checkout and test confirmation", 
     page.getByRole("heading", { name: "Conquering Pharmacy Care" }),
   ).toBeVisible();
   await page.getByRole("link", { name: "Continue to test checkout" }).click();
+  await expect(
+    page
+      .getByRole("region", { name: "Shop payment QR reference" })
+      .locator("img"),
+  ).toHaveAttribute("src", "/api/media/" + referenceImage);
   await page.getByLabel("Full name").fill("Demo Customer");
   await page.getByLabel("Email address").fill("demo@example.com");
   await page.getByLabel("Phone number").fill("+85512345678");

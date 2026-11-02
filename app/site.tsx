@@ -344,13 +344,13 @@ export default function Site({
           <div className="section-heading">
             <div>
               <span className="eyebrow">WEAR A LITTLE GOOD</span>
-              <h2>Good cause. Great tees.</h2>
+              <h2>Ten designs. One shared cause.</h2>
             </div>
             <Link className="text-link" href="/shop">
               Explore the shop <ArrowUpRight size={18} />
             </Link>
           </div>
-          <div className="grid two">{productCards(c.products.slice(0, 2))}</div>
+          <div className="grid two">{productCards(c.products)}</div>
         </section>
         <div className="container">
           <Campaigns campaigns={c.campaigns} media={media} />
@@ -747,6 +747,7 @@ export default function Site({
           purchase.
         </Intro>
         <Checkout
+          preview={preview}
           cart={cart}
           c={c}
           onComplete={(r) => {
@@ -790,6 +791,8 @@ export default function Site({
             </div>
           </div>
           <Donation
+            qrImage={c.settings.sharedQrImage}
+            preview={preview}
             onComplete={(r) => {
               sessionStorage.setItem("sabai-receipt", JSON.stringify(r));
               router.push("/receipt");
@@ -1359,7 +1362,9 @@ function Checkout({
   cart,
   c,
   onComplete,
+  preview,
 }: {
+  preview: boolean;
   cart: CartItem[];
   c: Content;
   onComplete: (r: Receipt) => void;
@@ -1480,6 +1485,11 @@ function Checkout({
         </button>
       </form>
       <aside className="order-summary">
+        <SharedQrReference
+          image={c.settings.sharedQrImage}
+          preview={preview}
+          purpose="merchandise"
+        />
         <span className="eyebrow">YOUR TEST ORDER</span>
         <h3>A little good in your bag.</h3>
         {cart.map((i) => (
@@ -1533,7 +1543,15 @@ function Checkout({
     </div>
   );
 }
-function Donation({ onComplete }: { onComplete: (r: Receipt) => void }) {
+function Donation({
+  onComplete,
+  qrImage,
+  preview,
+}: {
+  onComplete: (r: Receipt) => void;
+  qrImage: string;
+  preview: boolean;
+}) {
   const [amount, setAmount] = useState(10),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
@@ -1556,6 +1574,7 @@ function Donation({ onComplete }: { onComplete: (r: Receipt) => void }) {
     <form className="paper-form" onSubmit={submit}>
       <div className="badge">KHQR TEST MODE · USD DEMONSTRATION</div>
       <h3>A gift of care.</h3>
+      <SharedQrReference image={qrImage} preview={preview} purpose="donation" />
       <p>
         Choose a sample amount. USD availability must be confirmed with the
         future provider.
@@ -2080,6 +2099,44 @@ function Admin({ onContent }: { onContent: (c: Content) => void }) {
                   )}
                 </div>
                 {group === "products" && (
+                  <label>
+                    Upload original front/back mockup
+                    <input
+                      type="file"
+                      accept="image/png,image/webp,image/jpeg"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const form = new FormData();
+                        form.append("file", file);
+                        try {
+                          const r = await fetch("/api/admin/media", {
+                            method: "POST",
+                            body: form,
+                          });
+                          const b = await r.json();
+                          if (!r.ok) throw Error(b.error);
+                          setGroup(
+                            (
+                              draft[group] as unknown as Record<
+                                string,
+                                unknown
+                              >[]
+                            ).map((r, j) =>
+                              i === j ? { ...r, image: b.name } : r,
+                            ),
+                          );
+                          setMessage(
+                            "Mockup uploaded. Save changes to assign it to this product.",
+                          );
+                        } catch (err) {
+                          setMessage((err as Error).message);
+                        }
+                      }}
+                    />
+                  </label>
+                )}
+                {group === "products" && (
                   <p className="muted">
                     Image fields are filenames in the media library. Front/back
                     optional views can be added below; leave blank when
@@ -2253,6 +2310,11 @@ function Admin({ onContent }: { onContent: (c: Content) => void }) {
             references/. Do not approve public display until the organization
             and relevant people have consented.
           </p>
+          <QrReferenceManager
+            onSaved={async () => {
+              await load();
+            }}
+          />
           <MediaManager />
           <p>
             Uploaded filenames can be assigned in product, team and project
@@ -2679,6 +2741,119 @@ function Campaigns({
           </article>
         ))}
       </div>
+    </section>
+  );
+}
+
+function SharedQrReference({
+  image,
+  preview,
+  purpose,
+}: {
+  image: string;
+  preview: boolean;
+  purpose: "donation" | "merchandise";
+}) {
+  return (
+    <section
+      className="shared-qr-reference"
+      aria-label={
+        purpose === "donation"
+          ? "Donation QR reference"
+          : "Shop payment QR reference"
+      }
+    >
+      <span className="eyebrow">
+        {purpose === "donation" ? "DONATION" : "T-SHIRT PURCHASE"} · SEPARATE
+        PAYMENT SECTION
+      </span>
+      <h3>
+        {purpose === "donation"
+          ? "Support the mission."
+          : "Your T-shirt payment."}
+      </h3>
+      {image && preview ? (
+        <>
+          <Image
+            src={"/api/media/" + image}
+            alt="Cropped original shared QR — unverified internal reference"
+            width={280}
+            height={280}
+            unoptimized
+          />
+          <span className="badge">
+            UNVERIFIED REFERENCE · PAYMENTS DISABLED
+          </span>
+          <p>
+            The same original QR artwork is reused in both sections. Its
+            recipient and purpose must be confirmed before use; do not send
+            money through this preview.
+          </p>
+        </>
+      ) : (
+        <div className="qr-awaiting">
+          <Sun size={34} />
+          <p>
+            {image
+              ? "Payments are not enabled."
+              : "Original QR file needed. The poster itself will not appear in this payment section."}
+          </p>
+        </div>
+      )}
+      <small>
+        {purpose === "donation"
+          ? "Donations are recorded separately from product sales."
+          : "Product purchases stay in the shop checkout, separate from the donation page."}
+      </small>
+    </section>
+  );
+}
+function QrReferenceManager({ onSaved }: { onSaved: () => Promise<void> }) {
+  const [message, setMessage] = useState(""),
+    [busy, setBusy] = useState(false);
+  return (
+    <section className="qr-admin">
+      <h3>One QR, two separate sections</h3>
+      <p>
+        Upload the original poster or a clear QR file. The QR is located and
+        cropped with a white quiet zone; its source pixels are preserved and its
+        decoded content is checked again. The full poster is not placed on the
+        donation or shop payment page.
+      </p>
+      <form
+        onSubmit={async (e) => {
+          e.preventDefault();
+          setBusy(true);
+          try {
+            const r = await fetch("/api/admin/qr-reference", {
+              method: "POST",
+              body: new FormData(e.currentTarget),
+            });
+            const b = await r.json();
+            if (!r.ok) throw Error(b.error);
+            setMessage(b.message + " Detected: " + b.kind);
+            await onSaved();
+          } catch (err) {
+            setMessage((err as Error).message);
+          } finally {
+            setBusy(false);
+          }
+        }}
+      >
+        <label>
+          Poster or QR image
+          <input
+            type="file"
+            name="file"
+            accept="image/png,image/jpeg,image/webp"
+            required
+          />
+        </label>
+        <button className="button" disabled={busy}>
+          {busy ? "Extracting…" : "Extract and reuse original QR"}
+        </button>
+      </form>
+      <Alert message={message} />
     </section>
   );
 }
